@@ -233,12 +233,6 @@ void GazeboRosApiPlugin::gazeboQueueThread()
 
 void GazeboRosApiPlugin::advertiseServices()
 {
-  if (! enable_ros_network_)
-  {
-    ROS_INFO_NAMED("api_plugin", "ROS gazebo topics/services are disabled");
-    return;
-  }
-
   // publish clock for simulated ros time
   pub_clock_ = nh_->advertise<rosgraph_msgs::Clock>("/clock",10);
 
@@ -269,9 +263,13 @@ void GazeboRosApiPlugin::advertiseServices()
                                                           ros::VoidPtr(), &gazebo_queue_);
   unpause_physics_service_ = nh_->advertiseService(unpause_physics_aso);
 
+  // Moved his lower to allow above services on ARIAC
   if (! enable_ros_network_)
+  {
+    ROS_INFO_NAMED("api_plugin", "ROS gazebo topics/services are disabled");
     return;
- 
+  }
+
   // Advertise spawn services on the custom queue
   std::string spawn_sdf_model_service_name("spawn_sdf_model");
   ros::AdvertiseServiceOptions spawn_sdf_model_aso =
