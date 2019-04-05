@@ -263,13 +263,6 @@ void GazeboRosApiPlugin::advertiseServices()
                                                           ros::VoidPtr(), &gazebo_queue_);
   unpause_physics_service_ = nh_->advertiseService(unpause_physics_aso);
 
-  // Moved his lower to allow above services on ARIAC
-  if (! enable_ros_network_)
-  {
-    ROS_INFO_NAMED("api_plugin", "ROS gazebo topics/services are disabled");
-    return;
-  }
-
   // Advertise spawn services on the custom queue
   std::string spawn_sdf_model_service_name("spawn_sdf_model");
   ros::AdvertiseServiceOptions spawn_sdf_model_aso =
@@ -278,6 +271,13 @@ void GazeboRosApiPlugin::advertiseServices()
                                                                   boost::bind(&GazeboRosApiPlugin::spawnSDFModel,this,_1,_2),
                                                                   ros::VoidPtr(), &gazebo_queue_);
   spawn_sdf_model_service_ = nh_->advertiseService(spawn_sdf_model_aso);
+
+  // Moved this lower to allow above services on ARIAC
+  if (! enable_ros_network_)
+  {
+    ROS_INFO_NAMED("api_plugin", "ROS gazebo topics/services are disabled");
+    return;
+  }
 
   // Advertise delete services on the custom queue
   std::string delete_model_service_name("delete_model");
@@ -655,6 +655,8 @@ bool GazeboRosApiPlugin::spawnURDFModel(gazebo_msgs::SpawnModel::Request &req,
 bool GazeboRosApiPlugin::spawnSDFModel(gazebo_msgs::SpawnModel::Request &req,
                                        gazebo_msgs::SpawnModel::Response &res)
 {
+  ROS_WARN_NAMED("ariac", "spawnSDFModel service called");
+
   // incoming entity name
   std::string model_name = req.model_name;
 
